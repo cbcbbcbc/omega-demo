@@ -1,4 +1,4 @@
-package com.omega.demo.service.controller;
+package com.omega.demo.service.facade;
 
 import com.omega.demo.api.GUID;
 import com.omega.demo.api.bean.User;
@@ -13,7 +13,7 @@ import java.util.Random;
  */
 
 @RestController
-public class UserController {
+public class UserFacade {
 
     @Autowired
     UserEntity userEntity;

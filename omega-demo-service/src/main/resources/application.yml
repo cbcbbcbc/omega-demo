@@ -19,12 +19,8 @@ mycat:
       testOnBorrow: true
   servers: localhost:8066
 
-task:
-  lockPath: /task
-
 zookeeper:
   servers: 127.0.0.1:2181
-  sessionTimeout: 30000
 
 mybatis:
   mapper-locations: classpath:/mybatis/*.xml

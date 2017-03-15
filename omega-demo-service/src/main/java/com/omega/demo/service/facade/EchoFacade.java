@@ -1,4 +1,4 @@
-package com.omega.demo.service.controller;
+package com.omega.demo.service.facade;
 
 import com.omega.demo.api.bean.Greeting;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-public class EchoController {
+public class EchoFacade {
 
     @RequestMapping(value="/echo/{foo}", method = RequestMethod.POST)
     public String echo(@PathVariable("foo") String foo, @RequestBody Greeting greeting) {

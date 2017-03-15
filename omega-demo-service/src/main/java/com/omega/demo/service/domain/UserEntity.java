@@ -42,7 +42,7 @@ public class UserEntity {
     public void sendEmail(Task task) {
         // check if already executed
 
-        Map<String, String> dataMap = task.dataMap;
+        Map<String, String> dataMap = task.getDataMap();
         System.out.println("Sending email to user " + dataMap.get("userId"));
     }
 
