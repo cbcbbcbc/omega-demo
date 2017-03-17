@@ -1,8 +1,8 @@
 HTTP="http://localhost:9200"
 
-#echo "`date` Delete index orderform_20170314..."
-#curl -XDELETE $HTTP/orderform_20170314
-#echo
+echo "`date` Delete index orderform_20170314..."
+curl -XDELETE $HTTP/orderform_20170314
+echo
 
 echo "`date` Create index orderform_20170314..."
 curl -XPUT $HTTP/orderform_20170314 -d '{

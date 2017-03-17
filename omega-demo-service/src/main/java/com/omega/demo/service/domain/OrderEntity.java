@@ -10,18 +10,18 @@ import com.omega.framework.index.bean.IndexCommand;
 import com.omega.framework.util.cache.ICacheClient;
 import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregator;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramParser;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.metrics.sum.Sum;
 import org.elasticsearch.search.sort.SortOrder;
@@ -163,9 +163,9 @@ public class OrderEntity {
 
         // 先按日期聚合统计，注意此时不要加入日期过滤条件，也不需要排序、计算评分（因此用constant_score）
         SearchResponse aggsRsp = elasticsearchClient.prepareSearch(DEFAULT_INDEX_NAME).setTypes(DEFAULT_INDEX_NAME)
-                .addAggregation(AggregationBuilders.filter("filtered_orders").filter(filter).subAggregation(
+                .addAggregation(AggregationBuilders.filter("filtered_orders", filter).subAggregation(
                         AggregationBuilders.dateHistogram("gmtCreated").field("gmtCreated")
-                                .interval(DateHistogramInterval.DAY)
+                                .dateHistogramInterval(DateHistogramInterval.DAY)
                                 .format("yyyy-MM-dd")
                 )).get();
 

@@ -23,14 +23,14 @@
         insert into OrderForm
         (id, userId, number, amount, gmtCreated)
         values
-        (#{id}, #{userId}, #{number}, #{amount}, now())
+        (#{id}, #{userId}, #{number}, #{amount}, #{gmtCreated})
     </insert>
 
     <insert id="createOrderDetail">
         insert into OrderDetail
-        (id, orderFormId, itemNo, price, qty, amount)
+        (id, orderFormId, itemNo, itemName, price, qty, amount)
         values
-        (#{id}, #{orderFormId}, #{itemNo}, #{price}, #{qty}, #{amount})
+        (#{id}, #{orderFormId}, #{itemNo}, ${itemName}, #{price}, #{qty}, #{amount})
     </insert>
 
 </mapper>
