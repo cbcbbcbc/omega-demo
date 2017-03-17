@@ -2,6 +2,7 @@ package com.omega.demo.api.bean;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -9,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Created by jackychenb on 17/03/2017.
  */
-public class ListModel {
+public class ListModel implements Serializable {
 
     private static final long serialVersionUID = 8582733790767029728L;
 

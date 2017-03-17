@@ -7,14 +7,29 @@ import com.omega.demo.service.dao.OrderDao;
 import com.omega.framework.index.IndexCommandService;
 import com.omega.framework.index.IndexWorker;
 import com.omega.framework.index.bean.IndexCommand;
-import com.omega.framework.util.CacheClient;
+import com.omega.framework.util.cache.ICacheClient;
+import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.action.search.SearchType;
+import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregator;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramParser;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.metrics.sum.Sum;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +55,7 @@ public class OrderEntity {
     private TransportClient elasticsearchClient;
 
     @Autowired
-    private CacheClient cacheClient;
+    private ICacheClient cacheClient;
 
     /**
      * @return 索引任务ID，用于后续实时搜索
@@ -129,9 +144,95 @@ public class OrderEntity {
             indexCommandService.ensureRefresh(DEFAULT_INDEX_NAME, listModel.getLastIndexCommandId());
         }
 
-        elasticsearchClient.prepareSearch(DEFAULT_INDEX_NAME).setTypes(DEFAULT_INDEX_NAME)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        // 不影响评分的精确匹配条件用Filter
+        BoolQueryBuilder filter = QueryBuilders.boolQuery();
 
+        if (StringUtils.isNotBlank(listModel.getUserId())) {
+            filter.must(QueryBuilders.termQuery("userId", listModel.getUserId()));
+        }
+
+        if (StringUtils.isNotBlank(listModel.getNumber())) {
+            filter.must(QueryBuilders.termQuery("number", listModel.getNumber()));
+        }
+
+        if (StringUtils.isNotBlank(listModel.getItemNo())) {
+            filter.must(QueryBuilders.termQuery("itemNo", listModel.getItemNo()));
+        }
+
+        // 典型场景：左边显示一个日期列表，右边显示某一个日期的订单列表，同时显示总金额。
+
+        // 先按日期聚合统计，注意此时不要加入日期过滤条件，也不需要排序、计算评分（因此用constant_score）
+        SearchResponse aggsRsp = elasticsearchClient.prepareSearch(DEFAULT_INDEX_NAME).setTypes(DEFAULT_INDEX_NAME)
+                .addAggregation(AggregationBuilders.filter("filtered_orders").filter(filter).subAggregation(
+                        AggregationBuilders.dateHistogram("gmtCreated").field("gmtCreated")
+                                .interval(DateHistogramInterval.DAY)
+                                .format("yyyy-MM-dd")
+                )).get();
+
+        Histogram his = (Histogram) ((Filter) aggsRsp.getAggregations().get("filtered_orders"))
+                .getAggregations().get("gmtCreated");
+
+        List<Pair<String, Long>> gmtCreatedList = new ArrayList<Pair<String, Long>>();
+        for (Histogram.Bucket bucket : his.getBuckets()) {
+            String date = bucket.getKeyAsString();
+            long count = bucket.getDocCount();
+            gmtCreatedList.add(new Pair<>(date, count));
+        }
+
+        listModel.setGmtCreatedList(gmtCreatedList);
+
+        // 查询当前日期范围的订单，并聚合统计总金额
+        SearchRequestBuilder b = elasticsearchClient.prepareSearch(DEFAULT_INDEX_NAME).setTypes(DEFAULT_INDEX_NAME);
+
+        if (listModel.getGmtCreatedStart() != null || listModel.getGmtCreatedEnd() != null) {
+            RangeQueryBuilder rb = QueryBuilders.rangeQuery("gmtCreated");
+            if (listModel.getGmtCreatedStart() != null) {
+                rb.gte(listModel.getGmtCreatedStart());
+            }
+            if (listModel.getGmtCreatedEnd() != null) {
+                rb.lt(listModel.getGmtCreatedEnd());
+            }
+
+            filter.must(rb);
+        }
+
+        // 如果用户指定了排序字段，则无需评分，用constant_score提高查询性能
+        QueryBuilder query;
+        if (StringUtils.isNotBlank(listModel.getOrderBy()) || StringUtils.isBlank(listModel.getItemName())) {
+            if (StringUtils.isNotBlank(listModel.getItemName())) {
+                filter.must(QueryBuilders.matchQuery("itemName", listModel.getItemName()));
+            }
+
+            query = QueryBuilders.constantScoreQuery(filter);
+
+            if (StringUtils.isNotBlank(listModel.getOrderBy())) {
+                b.addSort(listModel.getOrderBy(), listModel.isDesc() ? SortOrder.DESC : SortOrder.ASC);
+            }
+        } else {
+            // 实际上这种业务场景较少用关键词匹配度排序，这里只是为了演示
+            BoolQueryBuilder bq = QueryBuilders.boolQuery();
+            bq.must(QueryBuilders.matchQuery("itemName", listModel.getItemName()));
+            bq.filter(filter);
+            query = bq;
+        }
+
+        SearchResponse sr = b.setQuery(query)
+                .addAggregation(AggregationBuilders.sum("amount").field("amount"))
+                .setFrom(listModel.getStart()).setSize(listModel.getPageSize()).get();
+
+        SearchHits hits = sr.getHits();
+        List<OrderForm> orderList = new ArrayList<OrderForm>();
+        for (SearchHit hit : hits) {
+            OrderForm order = getOrderById(hit.getId());
+            if (order != null) {
+                orderList.add(order);
+            }
+        }
+
+        Sum sum = (Sum) sr.getAggregations().get("amount");
+
+        listModel.setTotal((int) hits.getTotalHits());
+        listModel.setSum(new BigDecimal(sum.getValue()).setScale(2, BigDecimal.ROUND_HALF_UP));
         return listModel;
     }
 

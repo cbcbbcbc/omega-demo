@@ -56,12 +56,10 @@
     <dependency>
       <groupId>org.mybatis.spring.boot</groupId>
       <artifactId>mybatis-spring-boot-starter</artifactId>
-      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.21</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
@@ -85,15 +83,14 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>transport</artifactId>
+    </dependency>
+    <dependency>
       <groupId>au.com.dius</groupId>
       <artifactId>pact-jvm-consumer-junit_2.11</artifactId>
       <version>2.1.13</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>transport</artifactId>
-      <version>5.2.2</version>
     </dependency>
   </dependencies>
 </project>

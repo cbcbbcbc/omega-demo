@@ -1,9 +1,9 @@
 package com.omega.demo.api.bean;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
-import jdk.nashorn.internal.objects.annotations.Setter;
+import javafx.util.Pair;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by jackychenb on 17/03/2017.
@@ -12,12 +12,13 @@ public class OrderListModel extends ListModel {
 
     private String userId;
     private String number;
-    private BigDecimal amountStart;
-    private BigDecimal amountEnd;
     private BigDecimal gmtCreatedStart;
-    private BigDecimal gmtCreatedEnd;
+    private BigDecimal gmtCreatedEnd; // 约定范围都是前闭后开
     private String itemNo;
     private String itemName;
+
+    private List<Pair<String, Long>> gmtCreatedList; // 有订单的日期列表，Pair暂时借用javafx的
+    private BigDecimal sum;
 
     public OrderListModel() {
         this(40);
@@ -41,22 +42,6 @@ public class OrderListModel extends ListModel {
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    public BigDecimal getAmountStart() {
-        return amountStart;
-    }
-
-    public void setAmountStart(BigDecimal amountStart) {
-        this.amountStart = amountStart;
-    }
-
-    public BigDecimal getAmountEnd() {
-        return amountEnd;
-    }
-
-    public void setAmountEnd(BigDecimal amountEnd) {
-        this.amountEnd = amountEnd;
     }
 
     public BigDecimal getGmtCreatedStart() {
@@ -89,6 +74,22 @@ public class OrderListModel extends ListModel {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
+    }
+
+    public List<Pair<String, Long>> getGmtCreatedList() {
+        return gmtCreatedList;
+    }
+
+    public void setGmtCreatedList(List<Pair<String, Long>> gmtCreatedList) {
+        this.gmtCreatedList = gmtCreatedList;
+    }
+
+    public BigDecimal getSum() {
+        return sum;
+    }
+
+    public void setSum(BigDecimal sum) {
+        this.sum = sum;
     }
 
 }

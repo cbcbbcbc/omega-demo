@@ -3,6 +3,7 @@ package com.omega.demo.service.facade;
 import com.omega.demo.api.GUID;
 import com.omega.demo.api.bean.OrderDetail;
 import com.omega.demo.api.bean.OrderForm;
+import com.omega.demo.api.bean.OrderListModel;
 import com.omega.demo.api.bean.User;
 import com.omega.demo.api.error.CommonError;
 import com.omega.demo.api.exception.BizException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -38,6 +40,11 @@ public class OrderFacade {
     @RequestMapping("/orders/{userId}")
     public List<OrderForm> list(@PathVariable("userId") String userId) {
         return orderEntity.getOrderFormListByUserId(userId);
+    }
+
+    @RequestMapping("/orders/search")
+    public OrderListModel search(@RequestParam OrderListModel listModel) {
+        return orderEntity.search(listModel);
     }
 
     @RequestMapping(value="/testOrder/{userId}")
@@ -66,11 +73,15 @@ public class OrderFacade {
         int qty = rand.nextInt(100) + 1;
         BigDecimal amount = price.multiply(new BigDecimal(qty));
 
+        int days = rand.nextInt(3);
+        Date gmtCreated = new Date(new Date().getTime() - days * 24 * 3600 * 1000L);
+
         OrderForm o = new OrderForm();
         o.setId(generateId(user.getZoneCode()));
         o.setUserId(userId);
         o.setNumber("xxx");
         o.setAmount(amount);
+        o.setGmtCreated(gmtCreated);
 
         OrderDetail d = new OrderDetail();
         d.setId(generateId(user.getZoneCode()));
@@ -91,5 +102,7 @@ public class OrderFacade {
     private String generateId(String zoneCode) {
         return GUID.get() + zoneCode;
     }
+
+
 
 }

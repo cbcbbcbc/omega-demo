@@ -1,6 +1,6 @@
 package com.omega.demo.service;
 
-import com.omega.framework.util.EnableCacheClient;
+import com.omega.framework.util.cache.EnableCacheClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
