@@ -10,6 +10,7 @@ public class OrderDetail {
     private String id;
     private String orderFormId;
     private String itemNo;
+    private String itemName;
     private BigDecimal price;
     private int qty;
     private BigDecimal amount;
@@ -36,6 +37,14 @@ public class OrderDetail {
 
     public void setItemNo(String itemNo) {
         this.itemNo = itemNo;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public BigDecimal getPrice() {

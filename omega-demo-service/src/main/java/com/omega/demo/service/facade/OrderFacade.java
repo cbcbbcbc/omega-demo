@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -46,19 +47,39 @@ public class OrderFacade {
             throw new BizException(CommonError.RECORD_NOT_EXIST);
         }
 
+        String[] NAMES = {
+                "测试", "手机", "中国", "护眼灯", "茶杯", "电脑桌",
+                "塑料", "不锈钢", "电脑", "椅子", "窗帘", "三体",
+                "日本", "小狗", "电视"
+        };
+
+        StringBuffer sb = new StringBuffer();
+        Random rand = new Random();
+        int length = rand.nextInt(3) + 1;
+        for (int i = 0; i < length; i++) {
+            sb.append(NAMES[rand.nextInt(NAMES.length)]);
+        }
+
+        int price0 = rand.nextInt(10000) + 1;
+        BigDecimal price = new BigDecimal(price0).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
+
+        int qty = rand.nextInt(100) + 1;
+        BigDecimal amount = price.multiply(new BigDecimal(qty));
+
         OrderForm o = new OrderForm();
         o.setId(generateId(user.getZoneCode()));
         o.setUserId(userId);
         o.setNumber("xxx");
-        o.setAmount(new BigDecimal(new Random().nextInt(500)));
+        o.setAmount(amount);
 
         OrderDetail d = new OrderDetail();
         d.setId(generateId(user.getZoneCode()));
         d.setOrderFormId(o.getId());
         d.setItemNo("HK001");
-        d.setPrice(new BigDecimal(100));
-        d.setQty(2);
-        d.setAmount(new BigDecimal(200));
+        d.setItemName(sb.toString());
+        d.setPrice(price);
+        d.setQty(qty);
+        d.setAmount(amount);
 
         List<OrderDetail> detailList = new ArrayList<>();
         detailList.add(d);

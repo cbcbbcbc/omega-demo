@@ -18,11 +18,19 @@
   <dependencies>
     <dependency>
       <groupId>com.omega.framework</groupId>
+      <artifactId>omega-framework-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.omega.framework</groupId>
       <artifactId>omega-framework-datasource</artifactId>
     </dependency>
     <dependency>
       <groupId>com.omega.framework</groupId>
       <artifactId>omega-framework-task-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.omega.framework</groupId>
+      <artifactId>omega-framework-index-common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.omega.demo</groupId>
@@ -70,6 +78,22 @@
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>au.com.dius</groupId>
+      <artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+      <version>2.1.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>transport</artifactId>
+      <version>5.2.2</version>
     </dependency>
   </dependencies>
 </project>
