@@ -1,5 +1,6 @@
 package com.omega.demo.api.bean;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Created by jackychenb on 25/12/2016.
  */
-public class OrderForm {
+public class OrderForm implements Serializable {
 
     private String id;
     private String userId;

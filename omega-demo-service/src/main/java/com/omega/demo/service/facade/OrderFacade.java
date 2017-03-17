@@ -43,12 +43,12 @@ public class OrderFacade {
     }
 
     @RequestMapping("/orders/search")
-    public OrderListModel search(@RequestParam OrderListModel listModel) {
+    public OrderListModel search(@ModelAttribute OrderListModel listModel) {
         return orderEntity.search(listModel);
     }
 
     @RequestMapping(value="/testOrder/{userId}")
-    public void testCreate(@PathVariable("userId") String userId) {
+    public String testCreate(@PathVariable("userId") String userId) {
         User user = userEntity.getById(userId);
         if (user == null) {
             throw new BizException(CommonError.RECORD_NOT_EXIST);
@@ -96,13 +96,11 @@ public class OrderFacade {
         detailList.add(d);
         o.setDetailList(detailList);
 
-        orderEntity.createOrder(o);
+        return orderEntity.createOrder(o);
     }
 
     private String generateId(String zoneCode) {
         return GUID.get() + zoneCode;
     }
-
-
 
 }

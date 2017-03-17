@@ -1,9 +1,11 @@
 package com.omega.demo.api.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by wuzhengtao on 16/12/6.
  */
-public class User {
+public class User implements Serializable {
 
     private String id;
     private String name;

@@ -95,7 +95,7 @@ public class OrderEntity {
             m.put("id", id);
             m.put("userId", o.getUserId());
             m.put("number", o.getNumber());
-            m.put("amount", o.getAmount());
+            m.put("amount", o.getAmount().multiply(new BigDecimal(100)).intValue());
             m.put("gmtCreated", o.getGmtCreated());
 
             List<String> itemNoList = new ArrayList<String>();
@@ -232,7 +232,7 @@ public class OrderEntity {
         Sum sum = (Sum) sr.getAggregations().get("amount");
 
         listModel.setTotal((int) hits.getTotalHits());
-        listModel.setSum(new BigDecimal(sum.getValue()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        listModel.setSum(new BigDecimal(sum.getValue() / 100).setScale(2, BigDecimal.ROUND_HALF_UP));
         return listModel;
     }
 

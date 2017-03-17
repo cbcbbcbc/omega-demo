@@ -1,11 +1,12 @@
 package com.omega.demo.api.bean;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Created by jackychenb on 25/12/2016.
  */
-public class OrderDetail {
+public class OrderDetail implements Serializable {
 
     private String id;
     private String orderFormId;

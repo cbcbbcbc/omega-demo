@@ -30,7 +30,7 @@
         insert into OrderDetail
         (id, orderFormId, itemNo, itemName, price, qty, amount)
         values
-        (#{id}, #{orderFormId}, #{itemNo}, ${itemName}, #{price}, #{qty}, #{amount})
+        (#{id}, #{orderFormId}, #{itemNo}, #{itemName}, #{price}, #{qty}, #{amount})
     </insert>
 
 </mapper>

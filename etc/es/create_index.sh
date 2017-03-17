@@ -16,28 +16,27 @@ curl -XPUT $HTTP/orderform_20170314 -d '{
             "_all": { "enabled": false },
             "_source": { "enabled": false },
             "properties": {
-                "id": {
-                    "type": "keyword",
-                    "store": true
-                },
                 "userId": {
-                    "type": "keyword"
+                    "type": "string",
+                    "index": "not_analyzed"
                 },
                 "number": {
-                    "type": "keyword"
+                    "type": "string",
+                    "index": "not_analyzed"
                 },
                 "amount": {
-                    "type": "scaled_float",
-                    "scaling_factor": 100
+                    "type": "integer"
                 },
                 "gmtCreated": {
                     "type": "date"
                 },
                 "itemNo": {
-                    "type": "keyword"
+                    "type": "string",
+                    "index": "not_analyzed"
                 },
                 "itemName": {
-                    "type": "text"
+                    "type": "string",
+                    "index": "analyzed"
                 }
             }
         }

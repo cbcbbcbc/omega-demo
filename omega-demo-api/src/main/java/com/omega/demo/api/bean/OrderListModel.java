@@ -2,13 +2,14 @@ package com.omega.demo.api.bean;
 
 import javafx.util.Pair;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 /**
  * Created by jackychenb on 17/03/2017.
  */
-public class OrderListModel extends ListModel {
+public class OrderListModel extends ListModel implements Serializable {
 
     private String userId;
     private String number;
