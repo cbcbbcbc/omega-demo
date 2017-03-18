@@ -87,7 +87,10 @@ public class OrderEntity {
     public void index(IndexCommand cmd) {
         String id = cmd.data("id");
         if (IndexCommand.OP_DELETE == cmd.getOp()) {
-            elasticsearchClient.prepareDelete(DEFAULT_INDEX_NAME, DEFAULT_INDEX_NAME, id).get();
+            // 注意用cmd.getIndexName()而不是写死DEFAULT_INDEX_NAME。
+            // 当重建索引数据的时候，会新建一个索引库，然后向消息队列批量灌入IndexCommand，IndexCommand中的indexName
+            // 指向的是新索引库名字。待完成索引过程后，再将索引别名指向新的索引库。
+            elasticsearchClient.prepareDelete(cmd.getIndexName(), cmd.getIndexName(), id).get();
         } else {
             OrderForm o = getOrderById(id);
 
@@ -108,7 +111,10 @@ public class OrderEntity {
             m.put("itemNo", itemNoList);
             m.put("itemName", itemNameList);
 
-            elasticsearchClient.prepareIndex(DEFAULT_INDEX_NAME, DEFAULT_INDEX_NAME, id)
+            // 注意用cmd.getIndexName()而不是写死DEFAULT_INDEX_NAME。
+            // 当重建索引数据的时候，会新建一个索引库，然后向消息队列批量灌入IndexCommand，IndexCommand中的indexName
+            // 指向的是新索引库名字。待完成索引过程后，再将索引别名指向新的索引库。
+            elasticsearchClient.prepareIndex(cmd.getIndexName(), cmd.getIndexName(), id)
                     .setSource(m).get();
         }
     }
