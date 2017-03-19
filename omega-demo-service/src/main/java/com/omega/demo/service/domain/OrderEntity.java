@@ -109,7 +109,6 @@ public class OrderEntity {
             OrderForm o = getOrderById(id);
 
             Map<String, Object> m = new HashMap<String, Object>();
-            m.put("id", id);
             m.put("userId", o.getUserId());
             m.put("number", o.getNumber());
             m.put("amount", o.getAmount().multiply(new BigDecimal(100)).intValue());
