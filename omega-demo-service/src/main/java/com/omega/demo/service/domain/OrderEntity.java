@@ -1,5 +1,6 @@
 package com.omega.demo.service.domain;
 
+import com.omega.demo.api.bean.ISendEmailTask;
 import com.omega.demo.api.bean.OrderDetail;
 import com.omega.demo.api.bean.OrderForm;
 import com.omega.demo.api.bean.OrderListModel;
@@ -7,6 +8,8 @@ import com.omega.demo.service.dao.OrderDao;
 import com.omega.framework.index.IndexCommandService;
 import com.omega.framework.index.IndexWorker;
 import com.omega.framework.index.bean.IndexCommand;
+import com.omega.framework.task.TaskQueue;
+import com.omega.framework.task.bean.Task;
 import com.omega.framework.util.cache.ICacheClient;
 import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
@@ -43,10 +46,16 @@ import java.util.Map;
 public class OrderEntity {
 
     private static final String INDEX_COMMAND_TYPE = "orderform";
+    private static final String INDEX_DATA_ID = "id";
+
+    // 如果按照业务规则不同的订单要存储到不同的索引库，则不应使用此常量定义
     private static final String DEFAULT_INDEX_NAME = "orderform";
 
     @Autowired
     private OrderDao dao;
+
+    @Autowired
+    private TaskQueue taskQueue;
 
     @Autowired
     private IndexCommandService indexCommandService;
@@ -68,24 +77,29 @@ public class OrderEntity {
             dao.createOrderDetail(d);
         }
 
+        Task task = new Task(ISendEmailTask.TASK_TYPE);
+        task.data(ISendEmailTask.DATA_USER_ID, o.getUserId());
+        task.data(ISendEmailTask.DATA_EVENT, "Order Placed");
+        taskQueue.addTask(task);
+
         return updateIndex(o.getId());
     }
 
     private String updateIndex(String orderId) {
         IndexCommand cmd = new IndexCommand(INDEX_COMMAND_TYPE, DEFAULT_INDEX_NAME, IndexCommand.OP_ADD);
-        cmd.data("id", orderId);
+        cmd.data(INDEX_DATA_ID, orderId);
         return indexCommandService.exec(cmd);
     }
 
     private String removeIndex(String orderId) {
         IndexCommand cmd = new IndexCommand(INDEX_COMMAND_TYPE, DEFAULT_INDEX_NAME, IndexCommand.OP_DELETE);
-        cmd.data("id", orderId);
+        cmd.data(INDEX_DATA_ID, orderId);
         return indexCommandService.exec(cmd);
     }
 
     @IndexWorker(INDEX_COMMAND_TYPE)
     public void index(IndexCommand cmd) {
-        String id = cmd.data("id");
+        String id = cmd.data(INDEX_DATA_ID);
         if (IndexCommand.OP_DELETE == cmd.getOp()) {
             // 注意用cmd.getIndexName()而不是写死DEFAULT_INDEX_NAME。
             // 当重建索引数据的时候，管理脚本会新建一个索引库，然后向消息队列批量灌入IndexCommand，
@@ -242,6 +256,5 @@ public class OrderEntity {
         listModel.setSum(new BigDecimal(sum.getValue() / 100).setScale(2, BigDecimal.ROUND_HALF_UP));
         return listModel;
     }
-
 
 }
