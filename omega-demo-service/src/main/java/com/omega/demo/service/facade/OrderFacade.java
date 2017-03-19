@@ -42,7 +42,7 @@ public class OrderFacade {
         return orderEntity.getOrderFormListByUserId(userId);
     }
 
-    @RequestMapping("/orders/search")
+    @RequestMapping("/orders")
     public OrderListModel search(@ModelAttribute OrderListModel listModel) {
         return orderEntity.search(listModel);
     }

@@ -23,7 +23,7 @@ public class UserFacade {
         return userEntity.getById(id);
     }
 
-    @RequestMapping(value="/user/create", method = RequestMethod.POST)
+    @RequestMapping(value="/user", method = RequestMethod.POST)
     public void create(@RequestBody User user) {
         String zoneCode = allocateZoneCode(user);
         user.setId(generateId(zoneCode));
