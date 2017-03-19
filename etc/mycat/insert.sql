@@ -1,7 +1,7 @@
 use sk_dev;
 
-/*!mycat:dataNode=dn1*/ create function getTaskZoneCode() returns char(2) deterministic return('00');
-/*!mycat:dataNode=dn2*/ create function getTaskZoneCode() returns char(2) deterministic return('01');
+/** mycat:dataNode=dn1 */ create function getTaskZoneCode() returns char(2) deterministic return('00');
+/** mycat:dataNode=dn2 */ create function getTaskZoneCode() returns char(2) deterministic return('01');
 
 insert into User
 (id, name, zoneCode)
