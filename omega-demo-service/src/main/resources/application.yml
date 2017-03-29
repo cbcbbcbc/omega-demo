@@ -17,7 +17,7 @@ mycat:
     password: rootpass
     tomcat:
       testOnBorrow: true
-  servers: localhost:3306
+  servers: 127.0.0.1:3306
 
 zookeeper:
   servers: 127.0.0.1:2181
